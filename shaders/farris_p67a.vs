@@ -7,7 +7,7 @@ uniform mat4 modelviewmatrix[2]; // 0 model movement in real coords, 1 in camera
 uniform vec3 unib[4];
 //uniform vec2 umult, vmult => unib[2]
 //uniform vec2 u_off, v_off => unib[3]
-uniform vec3 unif[20];    // hpe
+uniform vec3 unif[20];
 
 varying vec2 texcoordout;
 
