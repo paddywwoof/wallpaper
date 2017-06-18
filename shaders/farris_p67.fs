@@ -19,7 +19,7 @@ vec2 eul(float angle) {
 void main(void) {
   float F =  unif[16][0]; // multiplied by texcoordout to increase pattern frequency
   float F1 = unif[16][1]; // second term factor (1 / 2 in original formula)
-  float F2 = unif[16][2]; // third term factor (1/ 2 in original formula)
+  float F2 = unif[16][2]; // third term factor (1 / 2 in original formula)
   vec2 z = texcoordout * F;
 
   vec2 uv_coord = (eul(TWO_PI * z.y) + 

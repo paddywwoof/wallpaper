@@ -8,7 +8,7 @@ import pi3d
 DISPLAY = pi3d.Display.create(x=50, y=50, frames_per_second=30)
 CAMERA = pi3d.Camera() # for 3D projection - box
 CAMERA2D = pi3d.Camera(is_3d=False) # for 2D projection - background and text display
-shader = pi3d.Shader("shaders/farris_p67a") # try the different shaders, explanation in the files
+shader = pi3d.Shader("shaders/farris_p67b") # try the different shaders, explanation in the files
 tex = pi3d.Texture("stripes2.jpg") # load different images
 box = pi3d.Cuboid(camera=CAMERA, x=0, y=0, z=2.2)
 box.set_draw_details(shader,[tex])
@@ -30,7 +30,7 @@ mouse.start()
 m_start = mouse.position()
 #       in  basic shader - type_a shader
 F = 1.0  # scale texcoord
-dt = 0.005   
+dt = DT = 0.005   
 F1 = 0.5      
 F2 = 0.5
 
@@ -45,9 +45,9 @@ while DISPLAY.loop_running():
   """
   F += dt
   if F > 4.0 and dt > 0.0:
-    dt = -0.001
+    dt = -DT
   elif F < 0.1 and dt < 0.0:
-    dt = 0.001
+    dt = DT
   m_pos = mouse.position()
   F1, F2 = (0.5 + (m - m_start[i]) / 1000 for i, m in enumerate(m_pos))
   F_txt.set_text('F  => {:04.3g}    '.format(F))
@@ -69,5 +69,5 @@ while DISPLAY.loop_running():
     F = 2.0
     m_start = mouse.position()
   #
-  #pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
-  #fr += 1
+  pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
+  fr += 1

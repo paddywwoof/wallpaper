@@ -23,12 +23,12 @@ void main(void) {
   bottom right.) F now varies the amount of color rotation by multiplying with
   the x component of z. i.e. none at left and F at right.
   
-  The if the rgb vector is rotated about the origin the values will become
+  If the rgb vector is rotated about the origin the values will become
   negative for much of the time (and default is to clamp to range 0-1).
   So the vector from (0.5, 0.5, 0.5) to the rgp point is rotated about an
-  orthogonal axis to that (i.e. (0, -b, g).dot(r, g, b) == 0) and the result
+  orthogonal axis to that (i.e. (0, -b', g').dot(r', g', b') == 0) and the result
   has (0.5, 0.5, 0.5) added back to it. The result will still fall outside
-  the 0-1 range but won't be too bad.
+  the 0-1 range occasionally but won't be too bad.
   
   The 3x3 matrix rot is standard for rotating about an axis
   */
