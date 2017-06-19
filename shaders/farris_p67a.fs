@@ -4,9 +4,6 @@ varying vec2 texcoordout;
 
 uniform sampler2D tex0;
 uniform vec3 unif[20];
-//uniform float F =========> unif[16][0]
-//uniform float F1 ========> unif[16][1]
-//uniform float F2 ========> unif[16][2]
 
 float TWO_PI = radians(360.0);
 float ROOT_3 = sqrt(3.0);
@@ -32,9 +29,9 @@ void main(void) {
   
   The 3x3 matrix rot is standard for rotating about an axis
   */
-  float F =  unif[16][0]; // scales the color rotation
-  float F1 = unif[16][1];
-  float F2 = unif[16][2];
+  float F =  unif[16][1]; // scales the color rotation
+  float F1 = unif[11][0]; // borrow L-n1
+  float F2 = unif[11][1]; // borrow L-m1
   vec2 z = texcoordout * 2.0;
 
   vec2 uv_coord = (eul(TWO_PI * z.y) + 

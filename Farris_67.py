@@ -4,6 +4,37 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 via Peter Farrell aka Hacking Math """
 import demo
 import pi3d
+import pickle
+
+class Param(object):
+  def __init__(self, name, u_num, val, incr=0.1):
+    self.name = name
+    self.u_num = u_num
+    self.val = val
+    self.incr = incr
+  def __getstate__(self):
+    ''' this and setstate needed for pickling diy classes '''
+    return {'name': self.name, 'u_num':self.u_num, 'val':self.val, 'incr':self.incr}
+  def __setstate__(self, state):
+    self.name = state['name']
+    self.u_num = state['u_num']
+    self.val = state['val']
+    self.incr = state['incr']
+
+try: # if previously saved by pressing 's'
+  with open('dump.pkl', 'rb') as f:
+    f_list = pickle.load(f)
+except:
+  # 33=>11,0 34=>11,1 35=>11,2 36=>12,0 # conversion to vec3 locations in shader
+  # 37=>12,1 38=>12,2 39=>13,0 40=>13,1
+  # 41=>13,2 42=>14,0 43=>14,1 44=>14,2
+  # 45=>15,0 46=>15,1 47=>15,2 48=>16,0
+  # 49=>16,1
+  f_list = [Param('L-n1', 33, 1.0), Param('L-m1', 34, 4.0), Param('L-ar1', 35, -0.2, 0.01), Param('L-ai1', 36, 0.2,0.01),
+            Param('L-n2', 37, -5.0), Param('L-m2', 38, -2.0), Param('L-ar2', 39, 0.1, 0.01), Param('L-ai2', 40, 0.2, 0.01),
+            Param('R-n1', 41, 1.0), Param('R-m1', 42, 4.0), Param('R-ar1', 43, -0.2, 0.01), Param('R-ai1', 44, 0.2,0.01),
+            Param('R-n2', 45, -5.0), Param('R-m2', 46, -2.0), Param('R-ar2', 47, 0.1, 0.01), Param('R-ai2', 48, 0.2, 0.01),
+            Param('R-rot', 49, 0.0)]
 
 DISPLAY = pi3d.Display.create(x=50, y=50, frames_per_second=30)
 CAMERA = pi3d.Camera() # for 3D projection - box
@@ -16,14 +47,15 @@ box.set_draw_details(shader,[tex])
 backplane = pi3d.ImageSprite(tex, camera=CAMERA2D, shader=shader, 
                   w=DISPLAY.width, h=DISPLAY.width, z=7000.0) # see FAQ explanation of z
 
-pointFont = pi3d.Font('fonts/NotoSans-Regular.ttf')
+i = 0
+pointFont = pi3d.Font('fonts/NotoSans-Regular.ttf', background_color=(0, 0, 0, 0))
 text = pi3d.PointText(pointFont, CAMERA2D, max_chars=200, point_size=64)
-F_txt = pi3d.TextBlock(-700, -100, 0.1, 0.0, 20, spacing='F', space=0.1, text_format='F')
-text.add_text_block(F_txt)
-F1_txt = pi3d.TextBlock(-700, -140, 0.1, 0.0, 20, spacing='F', space=0.1, text_format='F1')
-text.add_text_block(F1_txt)
-F2_txt = pi3d.TextBlock(-700, -180, 0.1, 0.0, 20, spacing='F', space=0.1, text_format='F2')
-text.add_text_block(F2_txt)
+f_txt = pi3d.TextBlock(-700, -380, 0.1, 0.0, 25, spacing='F', space=0.1, 
+        text_format='{} => {: 4.3g}    '.format(f_list[i].name, f_list[i].val))
+text.add_text_block(f_txt)
+for f in f_list:
+  box.unif[f.u_num] = f.val
+  backplane.unif[f.u_num] = f.val
 
 mouse = pi3d.Mouse(restrict = False)
 mouse.start()
@@ -31,43 +63,54 @@ m_start = mouse.position()
 #       in  basic shader - type_a shader
 F = 1.0  # scale texcoord
 dt = DT = 0.005   
-F1 = 0.5      
-F2 = 0.5
 
 fr = 0
 
 mykeys = pi3d.Keyboard()
 while DISPLAY.loop_running():
-  box.set_custom_data(48, [F, F1, F2]) # this is how to pass uniform variable to the shader
-  backplane.set_custom_data(48, [F, F1, F2])
-  """Three custom unif 
-  values used by star shader to animate image
-  """
   F += dt
   if F > 4.0 and dt > 0.0:
     dt = -DT
   elif F < 0.1 and dt < 0.0:
     dt = DT
   m_pos = mouse.position()
-  F1, F2 = (0.5 + (m - m_start[i]) / 1000 for i, m in enumerate(m_pos))
-  F_txt.set_text('F  => {:04.3g}    '.format(F))
-  F1_txt.set_text('F1 => {:04.3g}    '.format(F1))
-  F2_txt.set_text('F2 => {:04.3g}    '.format(F2))
   box.rotateIncX(0.051)
   box.rotateIncY(0.171)
   box.draw()
-  text.regen()
   text.draw()
   backplane.draw()
 
   k = mykeys.read()
+  ch = False
   if k == 27:
     mykeys.close()
     DISPLAY.destroy()
     break
-  elif k == ord('r'):
-    F = 2.0
-    m_start = mouse.position()
+  elif k == 261 or k == 137: # rgt
+    f_list[i].val += f_list[i].incr
+    ch = True
+  elif k == 260 or k == 136: # lft
+    f_list[i].val -= f_list[i].incr
+    ch = True
+  elif k == 259 or k == 134: # up
+    i += 1
+    if i >= len(f_list):
+      i = 0
+    ch = True
+  elif k == 258 or k == 135: # dwn
+    i -= 1
+    if i < 0:
+      i = len(f_list) - 1
+    ch = True
+  elif k == ord('s'):
+    with open('dump.pkl', 'wb') as f:
+      pickle.dump(f_list, f)
+  if ch:
+    f = f_list[i]
+    f_txt.set_text('{} => {: 4.3g}    '.format(f.name, f.val))
+    text.regen()
+    box.unif[f.u_num] = f.val
+    backplane.unif[f.u_num] = f.val
   #
-  pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
-  fr += 1
+  #pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
+  #fr += 1
