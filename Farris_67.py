@@ -13,7 +13,7 @@ class Param(object):
     self.val = val
     self.incr = incr
   def __getstate__(self):
-    ''' this and setstate needed for pickling diy classes '''
+    ''' this and __setstate__() needed for pickling diy classes '''
     return {'name': self.name, 'u_num':self.u_num, 'val':self.val, 'incr':self.incr}
   def __setstate__(self, state):
     self.name = state['name']
@@ -21,10 +21,8 @@ class Param(object):
     self.val = state['val']
     self.incr = state['incr']
 
-try: # if previously saved by pressing 's'
-  with open('dump.pkl', 'rb') as f:
-    f_list = pickle.load(f)
-except:
+def reset_f_list():
+  global f_list
   # 33=>11,0 34=>11,1 35=>11,2 36=>12,0 # conversion to vec3 locations in shader
   # 37=>12,1 38=>12,2 39=>13,0 40=>13,1
   # 41=>13,2 42=>14,0 43=>14,1 44=>14,2
@@ -36,11 +34,17 @@ except:
             Param('R-n2', 45, -5.0), Param('R-m2', 46, -2.0), Param('R-ar2', 47, 0.1, 0.01), Param('R-ai2', 48, 0.2, 0.01),
             Param('R-rot', 49, 0.0)]
 
+try: # if previously saved by pressing 's'
+  with open('dump.pkl', 'rb') as f:
+    f_list = pickle.load(f)
+except:
+  reset_f_list()
+
 DISPLAY = pi3d.Display.create(x=50, y=50, frames_per_second=30)
 CAMERA = pi3d.Camera() # for 3D projection - box
 CAMERA2D = pi3d.Camera(is_3d=False) # for 2D projection - background and text display
 shader = pi3d.Shader("shaders/farris_p67b") # try the different shaders, explanation in the files
-tex = pi3d.Texture("stripes2.jpg") # load different images
+tex = pi3d.Texture("dahlia2.jpg") # load different images
 box = pi3d.Cuboid(camera=CAMERA, x=0, y=0, z=2.2)
 box.set_draw_details(shader,[tex])
 
@@ -64,7 +68,7 @@ m_start = mouse.position()
 F = 1.0  # scale texcoord
 dt = DT = 0.005   
 
-fr = 0
+fr = 2014
 
 mykeys = pi3d.Keyboard()
 while DISPLAY.loop_running():
@@ -105,12 +109,15 @@ while DISPLAY.loop_running():
   elif k == ord('s'):
     with open('dump.pkl', 'wb') as f:
       pickle.dump(f_list, f)
+  elif k == ord('r'):
+    reset_f_list()
+    for f in f_list:
+      box.unif[f.u_num] = backplane.unif[f.u_num] = f.val
   if ch:
     f = f_list[i]
     f_txt.set_text('{} => {: 4.3g}    '.format(f.name, f.val))
     text.regen()
-    box.unif[f.u_num] = f.val
-    backplane.unif[f.u_num] = f.val
+    box.unif[f.u_num] = backplane.unif[f.u_num] = f.val
   #
-  #pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
-  #fr += 1
+  pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
+  fr += 1
