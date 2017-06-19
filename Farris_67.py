@@ -119,5 +119,5 @@ while DISPLAY.loop_running():
     text.regen()
     box.unif[f.u_num] = backplane.unif[f.u_num] = f.val
   #
-  pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
-  fr += 1
+  #pi3d.screenshot("/home/patrick/Downloads/Untitled Folder/scr_caps/rgus/fr{:05d}.jpg".format(fr))
+  #fr += 1
