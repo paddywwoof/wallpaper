@@ -37,6 +37,13 @@
     Term 1 <input type="checkbox" id="p_1"> Term 2 <input type="checkbox" id="p_2"> Term 3<input type="checkbox" id="p_3">
     n <input type="checkbox" id="p_n"> m <input type="checkbox" id="p_m"> a <input type="checkbox" id="p_a">
     Rotation <input type="checkbox" id="p_rot">
+    Texture <select id="texture_select"><option value="dahlia.jpg" selected>dahlia</option>
+                    <option value="dahlia2.jpg">dahlia2</option>
+                    <option value="poppy1.jpg">poppy1</option>
+                    <option value="grid.png">grid</option>
+                    <option value="stripes.jpg">stripes</option>
+                    <option value="stripes2.jpg">stripes2</option>
+            </select>
     </div>
 
     <script src="js/three.js"></script>
@@ -59,6 +66,7 @@
       uniform vec2 resolution;
       uniform float time;
       uniform vec4 unif[7];
+      uniform sampler2D texture;
 
       float TWO_PI = radians(360.0);
       float INV_RT3 = inversesqrt(3.0);
@@ -76,14 +84,17 @@
       void main()  {
         vec2 pxlxy = gl_FragCoord.xy / resolution.xy;
         float mix_f = smoothstep(0.2, 0.8, pxlxy.x); // linear between 0->1 as x 0.2->0.8
+
         float n1 = mix(unif[0][0], unif[3][0], mix_f); // lerp between left value and right value
         float m1 = mix(unif[0][1], unif[3][1], mix_f); 
         float ar1 = mix(unif[0][2], unif[3][2], mix_f); 
         float ai1 = mix(unif[0][3], unif[3][3], mix_f);
+
         float n2 = mix(unif[1][0], unif[4][0], mix_f); 
         float m2 = mix(unif[1][1], unif[4][1], mix_f); 
         float ar2 = mix(unif[1][2], unif[4][2], mix_f); 
         float ai2 = mix(unif[1][3], unif[4][3], mix_f);
+
         float n3 = mix(unif[2][0], unif[5][0], mix_f); 
         float m3 = mix(unif[2][1], unif[5][1], mix_f); 
         float ar3 = mix(unif[2][2], unif[5][2], mix_f); 
@@ -107,12 +118,8 @@
         float c_angl = mix_f * unif[6][0];
         mat2 rotn = mat2(cos(c_angl), sin(c_angl),
                         -sin(c_angl), cos(c_angl)); 
-        //gl_FragColor = texture2D(tex0, rotn * (uv_coord - vec2(0.5)) + vec2(0.5));
         uv_coord = rotn * (uv_coord - vec2(0.5)) + vec2(0.5);
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        gl_FragColor.r = smoothstep(0.25, 0.5, uv_coord.x);
-        gl_FragColor.g = smoothstep(0.5, 0.75, fract(uv_coord.x * 2.0));
-        gl_FragColor.b = smoothstep(0.1, 0.5, fract(-uv_coord.y * 2.5));
+        gl_FragColor = texture2D(texture, uv_coord);
       }
 
     </script>
@@ -126,6 +133,8 @@
       var camera, scene, renderer;
 
       var uniforms;
+      
+      var texture;
 
       init();
       animate();
@@ -149,8 +158,10 @@
                                 new THREE.Vector4(-1.0, 2.0, 0.41, 0.2),
                                 new THREE.Vector4(-3.0, 0.0, 0.07, 0.03),
 
-                                new THREE.Vector4(0.0, 0.0, 0.0, 0.0)]}
+                                new THREE.Vector4(0.0, 0.0, 0.0, 0.0)]},
+          texture:    {value: new THREE.TextureLoader().load("poppy1.jpg")}
         };
+ 
         m_loc = new THREE.Vector2();
         m_loc_old = new THREE.Vector2();
 
@@ -213,6 +224,11 @@
           document.getElementById("p_m").checked = false;
           document.getElementById("p_a").checked = false;
           document.getElementById("p_rot").checked = false;
+        }
+        
+        document.getElementById("texture_select").onchange = function() {
+          var texname = document.getElementById("texture_select").value;
+          uniforms.texture.value = new THREE.TextureLoader().load(texname);
         }
       }
 
