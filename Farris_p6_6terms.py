@@ -27,15 +27,19 @@ def reset_f_list():
   # 37=>12,1 38=>12,2 39=>13,0 40=>13,1
   # 41=>13,2 42=>14,0 43=>14,1 44=>14,2
   # 45=>15,0 46=>15,1 47=>15,2 48=>16,0
-  # 49=>16,1
+  # 49=>16,1 50=>16,2 51=>17,0 52=>17,1
+  # 53=>17,2 54=>18,0 55=>18,1 56=>18,2
+  # 57=>19,0
   f_list = [Param('L-n1', 33, 1.0), Param('L-m1', 34, 4.0), Param('L-ar1', 35, -0.2, 0.01), Param('L-ai1', 36, 0.2,0.01),
             Param('L-n2', 37, -5.0), Param('L-m2', 38, -2.0), Param('L-ar2', 39, 0.1, 0.01), Param('L-ai2', 40, 0.2, 0.01),
-            Param('R-n1', 41, 1.0), Param('R-m1', 42, 4.0), Param('R-ar1', 43, -0.2, 0.01), Param('R-ai1', 44, 0.2,0.01),
-            Param('R-n2', 45, -5.0), Param('R-m2', 46, -2.0), Param('R-ar2', 47, 0.1, 0.01), Param('R-ai2', 48, 0.2, 0.01),
-            Param('R-rot', 49, 0.0)]
+            Param('L-n3', 41, -1.0), Param('L-m3', 42, 5.0), Param('L-ar3', 43, 0.05, 0.01), Param('L-ai3', 44, 0.15, 0.01),
+            Param('R-n1', 45, 1.0), Param('R-m1', 46, 4.0), Param('R-ar1', 47, -0.2, 0.01), Param('R-ai1', 48, 0.2,0.01),
+            Param('R-n2', 49, -5.0), Param('R-m2', 50, -2.0), Param('R-ar2', 51, 0.1, 0.01), Param('R-ai2', 52, 0.2, 0.01),
+            Param('R-n3', 53, -1.0), Param('R-m3', 54, 5.0), Param('R-ar3', 55, 0.05, 0.01), Param('R-ai3', 56, 0.15, 0.01),
+            Param('R-rot', 57, 0.0, 0.0314159)]
 
 try: # if previously saved by pressing 's'
-  with open('dump.pkl', 'rb') as f:
+  with open('dump_6.pkl', 'rb') as f:
     f_list = pickle.load(f)
 except:
   reset_f_list()
@@ -43,7 +47,7 @@ except:
 DISPLAY = pi3d.Display.create(x=50, y=50, frames_per_second=30)
 CAMERA = pi3d.Camera() # for 3D projection - box
 CAMERA2D = pi3d.Camera(is_3d=False) # for 2D projection - background and text display
-shader = pi3d.Shader("shaders/farris_p67b") # try the different shaders, explanation in the files
+shader = pi3d.Shader("shaders/farris_p6_6term") # try the different shaders, explanation in the files
 tex = pi3d.Texture("poppy1.jpg") # load different images
 box = pi3d.Cuboid(camera=CAMERA, x=0, y=0, z=2.2)
 box.set_draw_details(shader,[tex])
@@ -107,7 +111,7 @@ while DISPLAY.loop_running():
       i = len(f_list) - 1
     ch = True
   elif k == ord('s'):
-    with open('dump.pkl', 'wb') as f:
+    with open('dump_6.pkl', 'wb') as f:
       pickle.dump(f_list, f)
   elif k == ord('r'):
     reset_f_list()
